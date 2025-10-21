@@ -1,5 +1,5 @@
 # 💫 About Me:
-👋 Hi, I’m @Forman75, my name is Andrei Kim | Привет, я @Forman75, меня зовут Андрей Ким<br>👀 I’m interested in cybersecurity | Я занимаюсь кибербезопасностью<br>🌱 I am a 2nd year student | Я студент 2 курса
+👋 Hi, I’m @Forman75, my name is Andrei Kim | Привет, я @Forman75, меня зовут Андрей Ким<br>👀 I’m interested in cybersecurity | Я занимаюсь кибербезопасностью<br>🌱 I am a 2nd year student at RTU MIREA | Я студент 2 курса РТУ МИРЭА
 
 
 # 💻 Tech Stack:
