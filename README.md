@@ -9,11 +9,6 @@
 <table align="center">
   <tr>
     <td align="center" width="96">
-        <!-- C и C++ -->
-        <img src="https://skillicons.dev/icons?i=c" alt="C" width="65" height="65" />
-      <br>C
-    </td>
-    <td align="center" width="96">
         <img src="https://techstack-generator.vercel.app/cpp-icon.svg" alt="C++" width="65" height="65" />
       <br>C++
     </td>
@@ -86,6 +81,7 @@
 <div align="center">
 
 ![](https://github-readme-stats.vercel.app/api?username=Forman75&theme=one_dark_pro&hide_border=false&include_all_commits=true&count_private=false)<br/>
+
 ![](https://nirzak-streak-stats.vercel.app/?user=Forman75&theme=one_dark_pro&hide_border=false)<br/>
 
 </div>
@@ -98,15 +94,6 @@
 ## <p align="center">🏆 GitHub Trophies | Трофеи Github:</p>
 <div align="center">
 
-![](https://github-profile-trophy.vercel.app/?username=Forman75&theme=onedark&no-frame=false&no-bg=false&margin-w=4)
-
-</div>
-
-### <p align="center">🔝 Top Contributed Repo | Топ репозиториев:</p>
-<div align="center">
-
-![](https://github-contributor-stats.vercel.app/api?username=Forman75&limit=5&theme=one_dark_pro&combine_all_yearly_contributions=true)
-
-</div>
+![](https://github-profile-trophy-fork-two.vercel.app/?username=Forman75&theme=onedark&no-frame=false&no-bg=false&margin-w=4)
 
 ---
