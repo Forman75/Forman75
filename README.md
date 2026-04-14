@@ -4,7 +4,7 @@
 <br>
 
 # <p align="center">💻 Tech Stack | Технический стек:</p>
-## <p align="center">Языки программирования / Скриптовые языки | Programming Languages / Scripting Languages:</p>
+## <p align="center">Programming Languages / Scripting Languages | Языки программирования / Скриптовые языки:</p>
 <div style="display: flex; align-items: flex-start; align: center">
 <table align="center">
   <tr>
