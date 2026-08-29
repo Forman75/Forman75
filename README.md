@@ -1,5 +1,5 @@
 # <p align="center">💫 About Me | Обо мне:</p>
-<p align="center">👋 Hi, I’m @Forman75, my name is Andrei Kim | Привет, я @Forman75, меня зовут Андрей Ким<br>👀 I’m interested in cybersecurity | Я занимаюсь кибербезопасностью<br>🌱 I am a 2nd year student at RTU MIREA | Я студент 2 курса РТУ МИРЭА</p>
+<p align="center">👋 Hi, I’m @Forman75, my name is Andrei Kim | Привет, я @Forman75, меня зовут Андрей Ким<br>👀 I work in information security | Я занимаюсь информационной безопасностью <br>🌱 I am a 3nd year student at RTU MIREA | Я студент 3 курса РТУ МИРЭА</p>
 
 <br>
 
@@ -82,11 +82,11 @@
 
 ![](https://github-readme-stats.vercel.app/api?username=Forman75&theme=one_dark_pro&hide_border=false&include_all_commits=true&count_private=false)<br/>
 
-![](https://nirzak-streak-stats.vercel.app/?user=Forman75&theme=one_dark_pro&hide_border=false)<br/>
+
 
 </div>
 <p align="center">
-  <a href="https://github.com/ishandutta2007/beautiful-github-homepage"><picture><img align="" height='150px' src="https://beautiful-github-homepage.vercel.app/api?username=forman75&hide_title=true&show_icons=true&theme=one_dark_pro&include_all_commits=true" alt="aryashah2k" /></picture></a>
+  <a href="https://github.com/ishandutta2007/beautiful-github-homepage"><picture><img align="" height='150px' src="https://beautiful-github-homepage.vercel.app/api?username=forman75&hide_title=false&show_icons=true&theme=one_dark_pro&include_all_commits=true" /></picture></a>
   <a href="https://github.com/ishandutta2007/beautiful-github-homepage"><picture><img align="" height='150px' src="https://beautiful-github-homepage.vercel.app/api/top-langs/?username=forman75&hide_title=false&layout=compact&theme=one_dark_pro&count_private=true" /></picture></a>
 </p>
 
@@ -94,6 +94,6 @@
 ## <p align="center">🏆 GitHub Trophies | Трофеи Github:</p>
 <div align="center">
 
-![](https://github-profile-trophy-fork-two.vercel.app/?username=Forman75&theme=onedark&no-frame=false&no-bg=false&margin-w=4)
+![](https://github-profile-repo.vercel.app/?username=Forman75&theme=onedark&no-frame=false&no-bg=false&margin-w=4)
 
 ---
