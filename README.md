@@ -10,6 +10,11 @@
   </a>
 </p>
 
+<!-- Счетчик просмотров профиля (без ссылок на соцсети и связь) -->
+<p align="center">
+  <img src="https://komarev.com/ghpvc/?username=Forman75&label=Profile%20Views&color=61afef&style=for-the-badge" alt="Profile Views" />
+</p>
+
 <!-- Анимированный неоновый разделитель -->
 <p align="center">
   <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif" width="100%" alt="Divider" />
@@ -72,6 +77,7 @@
       <img src="https://cdn.simpleicons.org/wireshark/1679A7" alt="Wireshark" width="60" height="60" />
       <br><b>Wireshark</b>
     </td>
+  </tr>
 </table>
 
 <br>
@@ -121,10 +127,10 @@
 
 <h1 align="center">📊 GitHub Stats | Статистика на GitHub:</h1>
 
-<!-- Карточки статистики и языков -->
+<!-- Карточки статистики и языков в ТЕМНОЙ теме (theme=onedark слитно) -->
 <p align="center">
-  <img height="165px" src="https://github-readme-stats.vercel.app/api?username=Forman75&theme=onedark&hide_border=false&count_private=true&show_icons=true" alt="GitHub Stats" />
-  <img height="165px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Forman75&theme=onedark&hide_border=false&count_private=true&layout=compact&hide=jupyter%20notebook" alt="Top Languages" />
+  <img height="165px" src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=Forman75&theme=onedark" alt="GitHub Stats" />
+  <img height="165px" src="https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=Forman75&theme=onedark" alt="Top Languages" />
 </p>
 
 <!-- Серия коммитов (GitHub Streak) -->
@@ -132,13 +138,18 @@
   <img height="165px" src="https://streak-stats.demolab.com?user=Forman75&theme=onedark&hide_border=false" alt="GitHub Streak" />
 </p>
 
+<!-- График активности в темной теме (theme=onedark) -->
+<p align="center">
+  <img width="92%" src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=Forman75&theme=onedark" alt="Profile Details" />
+</p>
+
 <br>
 
 <h2 align="center">🏆 GitHub Trophies | Трофеи GitHub:</h2>
 
-<!-- Ваш собственный сервер на Vercel -->
+<!-- Автономные трофеи из вашей собственной ветки output (генерируются через GitHub Actions) -->
 <p align="center">
-  <img src="https://github-profile-trophy-f76.vercel.app/?username=Forman75&theme=onedark&no-frame=false&no-bg=true&margin-w=4&row=1" alt="Trophies" />
+  <img src="https://raw.githubusercontent.com/Forman75/Forman75/output/trophies.svg" alt="Trophies" width="95%" />
 </p>
 
 <br>
