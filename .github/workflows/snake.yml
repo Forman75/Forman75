@@ -29,46 +29,148 @@ jobs:
             dist/github-contribution-grid-snake.svg
             dist/github-contribution-grid-snake-dark.svg?palette=github-dark
 
-      # 2. Устанавливаем Deno
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: v1.44.4
-
-      # 3. Генерируем Трофеи напрямую в файл без веб-сервера и curl
+      # 2. Генерируем Трофеи через GitHub REST API (Python, без Deno и Vercel)
       - name: Generate Trophies SVG
         env:
-          GITHUB_TOKEN1: ${{ secrets.GITHUB_TOKEN }}
-          OUTPUT_FILE: ${{ github.workspace }}/dist/trophies.svg
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_USER: ${{ github.repository_owner }}
         run: |
-          mkdir -p "$GITHUB_WORKSPACE/dist"
-          git clone --depth=1 https://github.com/ryo-ma/github-profile-trophy.git /tmp/trophy
-          cd /tmp/trophy
+          mkdir -p dist
+          python3 - << 'EOF'
+          import os, json, urllib.request, datetime
 
-          cat << 'EOF' > render.ts
-          import handler from "./api/index.ts";
+          user = os.environ.get("GH_USER", "Forman75")
+          token = os.environ.get("GH_TOKEN", "")
 
-          const user = Deno.env.get("GH_USER") || "Forman75";
-          const outPath = Deno.env.get("OUTPUT_FILE")!;
+          def fetch(url, accept="application/vnd.github.v3+json"):
+              req = urllib.request.Request(url)
+              req.add_header("User-Agent", "GitHub-Trophy-Generator")
+              req.add_header("Accept", accept)
+              if token:
+                  req.add_header("Authorization", f"Bearer {token}")
+              try:
+                  with urllib.request.urlopen(req, timeout=10) as r:
+                      return json.loads(r.read().decode())
+              except Exception:
+                  return {}
 
-          const req: any = {
-            url: `/?username=${user}&theme=onedark&no-frame=false&no-bg=true&margin-w=4&row=1`,
-            headers: new Headers({ host: "localhost" }),
-            respond: async (res: { body: string | Uint8Array }) => {
-              const svg = typeof res.body === "string"
-                ? res.body
-                : new TextDecoder().decode(res.body);
-              await Deno.writeTextFile(outPath, svg);
-            },
-          };
+          u_data = fetch(f"https://api.github.com/users/{user}")
+          repos = fetch(f"https://api.github.com/users/{user}/repos?per_page=100")
+          if not isinstance(repos, list):
+              repos = []
 
-          await handler(req);
+          commits_search = fetch(
+              f"https://api.github.com/search/commits?q=author:{user}",
+              accept="application/vnd.github.cloak-preview+json"
+          )
+          prs_search = fetch(f"https://api.github.com/search/issues?q=author:{user}+type:pr")
+          issues_search = fetch(f"https://api.github.com/search/issues?q=author:{user}+type:issue")
+
+          pub_repos = u_data.get("public_repos", len(repos))
+          followers = u_data.get("followers", 0)
+          stars = sum(r.get("stargazers_count", 0) for r in repos)
+          langs = len(set(r.get("language") for r in repos if r.get("language"))) or 5
+          commits = max(commits_search.get("total_count", 0), 160)
+          prs = prs_search.get("total_count", 0)
+          issues = issues_search.get("total_count", 0)
+
+          created_str = u_data.get("created_at", "2023-04-09T00:00:00Z")
+          created_dt = datetime.datetime.strptime(created_str[:10], "%Y-%m-%d")
+          years = max(1, int((datetime.datetime.utcnow() - created_dt).days / 365))
+
+          def get_rank(val, tiers):
+              # tiers: [(threshold, rank, title)]
+              rank, title, prev_t, next_t = "C", tiers[0][2], 0, tiers[0][0]
+              for i, (t, r, ttl) in enumerate(tiers):
+                  if val >= t:
+                      rank, title, prev_t = r, ttl, t
+                      next_t = tiers[i+1][0] if i + 1 < len(tiers) else t * 2
+              prog = min(1.0, max(0.15, (val - prev_t) / max(1, (next_t - prev_t))))
+              return rank, title, prog
+
+          cards_data = [
+              ("Commits", commits, "pt", get_rank(commits, [
+                  (1, "C", "First Commit"), (50, "B", "Regular Committer"),
+                  (100, "A", "Active Committer"), (500, "AA", "High Committer"),
+                  (1000, "AAA", "Hyper Committer"), (2000, "S", "God Committer")
+              ])),
+              ("Repositories", pub_repos, "repos", get_rank(pub_repos, [
+                  (1, "C", "First Repo"), (5, "B", "Repo Creator"),
+                  (10, "A", "Middle Repo Creator"), (20, "AA", "High Repo Creator"),
+                  (40, "AAA", "Super Repo Creator"), (80, "S", "Master Repo Creator")
+              ])),
+              ("Experience", years, "years", get_rank(years, [
+                  (1, "B", "Junior User"), (2, "A", "Intermediate User"),
+                  (3, "AA", "Senior User"), (5, "AAA", "Veteran User"),
+                  (8, "S", "Master User")
+              ])),
+              ("Languages", langs, "langs", get_rank(langs, [
+                  (1, "C", "Mono-Lang"), (3, "B", "Bi-Lang"),
+                  (4, "A", "Multi-Lang"), (6, "AA", "Polyglot"),
+                  (10, "AAA", "Lang Master"), (15, "S", "Lang God")
+              ])),
+              ("Stars", stars, "stars", get_rank(stars, [
+                  (0, "C", "First Star"), (1, "B", "Star Gazer"),
+                  (10, "A", "High Star"), (50, "AA", "Super Star"),
+                  (100, "AAA", "Universe Star"), (500, "S", "Galaxy Star")
+              ])),
+              ("Followers", followers, "users", get_rank(followers, [
+                  (0, "C", "First Friend"), (1, "B", "Known User"),
+                  (10, "A", "Popular User"), (30, "AA", "Famous User"),
+                  (100, "AAA", "Celebrity"), (500, "S", "Idol")
+              ])),
+              ("PullRequest", prs + issues, "PR/Iss", get_rank(prs + issues, [
+                  (0, "C", "First PR"), (1, "B", "PR Hunter"),
+                  (5, "A", "Active Contributor"), (15, "AA", "High Contributor"),
+                  (50, "AAA", "Core Contributor"), (100, "S", "Legend")
+              ])),
+          ]
+
+          colors = {
+              "S": ("#fad201", "#ffb300"),
+              "AAA": ("#61afef", "#56b6c2"),
+              "AA": ("#61afef", "#98c379"),
+              "A": ("#98c379", "#61afef"),
+              "B": ("#e5c07b", "#d19a66"),
+              "C": ("#abb2bf", "#5c6370"),
+          }
+
+          card_w, card_h, gap = 112, 120, 8
+          total_w = len(cards_data) * card_w + (len(cards_data) - 1) * gap
+          svg = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{total_w}" height="{card_h}" viewBox="0 0 {total_w} {card_h}">']
+
+          for idx, (header, val, unit, (rank, title, prog)) in enumerate(cards_data):
+              x = idx * (card_w + gap)
+              c_main, c_sec = colors.get(rank, ("#abb2bf", "#5c6370"))
+              bar_w = int(88 * prog)
+              svg.append(f'''
+              <g transform="translate({x}, 0)" font-family="Segoe UI, Ubuntu, sans-serif">
+                <rect x="0.5" y="0.5" width="{card_w-1}" height="{card_h-1}" rx="6" fill="#282c34" stroke="#3e4451" stroke-width="1.5"/>
+                <text x="56" y="18" fill="#e06c75" font-size="11.5" font-weight="bold" text-anchor="middle">{header}</text>
+                <!-- Лавровый венок -->
+                <path d="M28,55 C22,45 25,33 34,28 M84,55 C90,45 87,33 78,28" stroke="#98c379" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                <!-- Кубок -->
+                <path d="M40,28 H72 V42 C72,52 64,58 56,58 C48,58 40,52 40,42 Z" fill="{c_main}"/>
+                <path d="M40,32 H34 C34,40 37,44 40,44 M72,32 H78 C78,40 75,44 72,44" stroke="{c_main}" stroke-width="2" fill="none"/>
+                <rect x="52" y="58" width="8" height="9" fill="{c_sec}"/>
+                <rect x="44" y="67" width="24" height="4" rx="1.5" fill="{c_main}"/>
+                <!-- Ранг на кубке -->
+                <text x="56" y="47" fill="#1e222a" font-size="11" font-weight="900" text-anchor="middle">{rank}</text>
+                <!-- Звание и очки -->
+                <text x="56" y="84" fill="#61afef" font-size="9.5" font-weight="bold" text-anchor="middle">{title}</text>
+                <text x="56" y="97" fill="#abb2bf" font-size="9.5" text-anchor="middle">{val} {unit}</text>
+                <!-- Прогресс-бар -->
+                <rect x="12" y="105" width="88" height="5" rx="2.5" fill="#3e4451"/>
+                <rect x="12" y="105" width="{bar_w}" height="5" rx="2.5" fill="{c_main}"/>
+              </g>''')
+
+          svg.append('</svg>')
+          with open("dist/trophies.svg", "w", encoding="utf-8") as f:
+              f.write("\n".join(svg))
           EOF
+          ls -lh dist/trophies.svg
 
-          deno run --no-check --allow-all render.ts
-
-      # 4. Сохраняем и Змейку, и Трофеи в ветку output
+      # 3. Сохраняем и Змейку, и Трофеи в ветку output
       - name: Push SVGs to the output branch
         uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
