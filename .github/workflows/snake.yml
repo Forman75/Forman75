@@ -29,20 +29,46 @@ jobs:
             dist/github-contribution-grid-snake.svg
             dist/github-contribution-grid-snake-dark.svg?palette=github-dark
 
-      # 2. Генерируем Трофеи через стабильное официальное действие
-      - name: Generate Trophies
-        uses: ryo-ma/github-profile-trophy@v3
+      # 2. Устанавливаем Deno
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USERNAME: ${{ github.repository_owner }}
-          THEME: onedark
-          NO_FRAME: "false"
-          NO_BG: "true"
-          MARGIN_W: "4"
-          ROW: "1"
-          OUTPUT: dist/trophies.svg
+          deno-version: v1.44.4
 
-      # 3. Сохраняем всё в ветку output
+      # 3. Генерируем Трофеи напрямую в файл без веб-сервера и curl
+      - name: Generate Trophies SVG
+        env:
+          GITHUB_TOKEN1: ${{ secrets.GITHUB_TOKEN }}
+          OUTPUT_FILE: ${{ github.workspace }}/dist/trophies.svg
+          GH_USER: ${{ github.repository_owner }}
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          git clone --depth=1 https://github.com/ryo-ma/github-profile-trophy.git /tmp/trophy
+          cd /tmp/trophy
+
+          cat << 'EOF' > render.ts
+          import handler from "./api/index.ts";
+
+          const user = Deno.env.get("GH_USER") || "Forman75";
+          const outPath = Deno.env.get("OUTPUT_FILE")!;
+
+          const req: any = {
+            url: `/?username=${user}&theme=onedark&no-frame=false&no-bg=true&margin-w=4&row=1`,
+            headers: new Headers({ host: "localhost" }),
+            respond: async (res: { body: string | Uint8Array }) => {
+              const svg = typeof res.body === "string"
+                ? res.body
+                : new TextDecoder().decode(res.body);
+              await Deno.writeTextFile(outPath, svg);
+            },
+          };
+
+          await handler(req);
+          EOF
+
+          deno run --no-check --allow-all render.ts
+
+      # 4. Сохраняем и Змейку, и Трофеи в ветку output
       - name: Push SVGs to the output branch
         uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
