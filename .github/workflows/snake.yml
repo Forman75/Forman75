@@ -1,4 +1,4 @@
-name: Generate Snake & Trophies
+name: Generate Snake, Trophies & All Languages
 
 on:
   schedule:
@@ -29,36 +29,133 @@ jobs:
             dist/github-contribution-grid-snake.svg
             dist/github-contribution-grid-snake-dark.svg?palette=github-dark
 
-      # 2. Генерируем Трофеи через GitHub REST API (Python, без Deno и Vercel)
-      - name: Generate Trophies SVG
+      # 2. Генерируем Трофеи и Карточку ВСЕХ языков (Python + GitHub REST API)
+      - name: Generate Trophies & Top Languages SVGs
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_USER: ${{ github.repository_owner }}
         run: |
           mkdir -p dist
           python3 - << 'EOF'
-          import os, json, urllib.request, datetime
+          import os, json, html, urllib.request, datetime
 
           user = os.environ.get("GH_USER", "Forman75")
           token = os.environ.get("GH_TOKEN", "")
 
           def fetch(url, accept="application/vnd.github.v3+json"):
               req = urllib.request.Request(url)
-              req.add_header("User-Agent", "GitHub-Trophy-Generator")
+              req.add_header("User-Agent", "GitHub-Profile-Generator")
               req.add_header("Accept", accept)
               if token:
                   req.add_header("Authorization", f"Bearer {token}")
               try:
-                  with urllib.request.urlopen(req, timeout=10) as r:
+                  with urllib.request.urlopen(req, timeout=15) as r:
                       return json.loads(r.read().decode())
               except Exception:
                   return {}
 
+          # Получаем профиль и все репозитории пользователя
           u_data = fetch(f"https://api.github.com/users/{user}")
-          repos = fetch(f"https://api.github.com/users/{user}/repos?per_page=100")
+          repos = fetch(f"https://api.github.com/users/{user}/repos?per_page=100&type=owner")
           if not isinstance(repos, list):
               repos = []
 
+          # Обходим КАЖДЫЙ репозиторий и собираем абсолютно все языки
+          lang_bytes = {}
+          for r in repos:
+              langs_url = r.get("languages_url")
+              if langs_url:
+                  r_langs = fetch(langs_url)
+                  if isinstance(r_langs, dict):
+                      for l_name, b_count in r_langs.items():
+                          lang_bytes[l_name] = lang_bytes.get(l_name, 0) + int(b_count)
+
+          # Сортируем языки по убыванию объема кода
+          sorted_langs = sorted(lang_bytes.items(), key=lambda x: x[1], reverse=True)
+          total_bytes = sum(b for _, b in sorted_langs) or 1
+
+          # Палитра цветов языков GitHub (адаптированная под темную тему One Dark)
+          LANG_COLORS = {
+              "Python": "#3572A5",
+              "Jupyter Notebook": "#DA5B0B",
+              "C++": "#f34b7d",
+              "C": "#A8B9CC",
+              "C#": "#178600",
+              "HTML": "#e34c26",
+              "CSS": "#a277ff",
+              "SCSS": "#c6538c",
+              "JavaScript": "#f1e05a",
+              "TypeScript": "#3178c6",
+              "PowerShell": "#5391FE",
+              "Shell": "#89e051",
+              "Bash": "#89e051",
+              "Batchfile": "#C1F12E",
+              "Makefile": "#68b723",
+              "CMake": "#DA3434",
+              "Dockerfile": "#2496ED",
+              "Rust": "#dea584",
+              "Go": "#00ADD8",
+              "Java": "#b07219",
+              "Kotlin": "#A97BFF",
+              "Lua": "#00a2ff",
+              "PHP": "#4F5D95",
+              "Ruby": "#701516",
+              "SQL": "#e38c00",
+              "Assembly": "#6E4C13",
+              "ShaderLab": "#222c37",
+              "HLSL": "#aace60",
+              "GLSL": "#5686a5",
+          }
+          FALLBACK_COLORS = ["#61afef", "#98c379", "#e5c07b", "#c678dd", "#56b6c2", "#e06c75", "#d19a66"]
+
+          # --- ГЕНЕРАЦИЯ КАРТОЧКИ ВСЕХ ЯЗЫКОВ (dist/top-langs.svg) ---
+          num_langs = len(sorted_langs)
+          cols = 2
+          rows = max(1, (num_langs + cols - 1) // cols)
+          card_w = 380
+          card_h = max(165, 68 + rows * 22 + 12)
+          bar_w = card_w - 40
+
+          lang_svg = [
+              f'<svg xmlns="http://www.w3.org/2000/svg" width="{card_w}" height="{card_h}" viewBox="0 0 {card_w} {card_h}">',
+              f'  <defs><clipPath id="bar-clip"><rect x="20" y="42" width="{bar_w}" height="10" rx="5"/></clipPath></defs>',
+              f'  <rect x="0.5" y="0.5" width="{card_w-1}" height="{card_h-1}" rx="6" fill="#282c34" stroke="#3e4451" stroke-width="1.5"/>',
+              f'  <text x="20" y="27" fill="#e5c07b" font-family="Segoe UI, Ubuntu, sans-serif" font-size="15" font-weight="bold">Most Used Languages ({num_langs})</text>',
+              f'  <rect x="20" y="42" width="{bar_w}" height="10" rx="5" fill="#3e4451"/>',
+              f'  <g clip-path="url(#bar-clip)">'
+          ]
+
+          # Рисуем мульти-сегментный прогресс-бар (даже малым языкам даем минимум 3px видимости)
+          cur_x = 20.0
+          for idx, (l_name, b_count) in enumerate(sorted_langs):
+              color = LANG_COLORS.get(l_name, FALLBACK_COLORS[idx % len(FALLBACK_COLORS)])
+              seg_w = max(3.0, (b_count / total_bytes) * bar_w)
+              if idx == len(sorted_langs) - 1:
+                  seg_w = max(3.0, (20 + bar_w) - cur_x)
+              lang_svg.append(f'    <rect x="{cur_x:.2f}" y="42" width="{seg_w:.2f}" height="10" fill="{color}"/>')
+              cur_x += seg_w
+          lang_svg.append('  </g>')
+
+          # Выводим список всех языков в 2 колонки
+          for idx, (l_name, b_count) in enumerate(sorted_langs):
+              col = idx % cols
+              row = idx // cols
+              lx = 24 + col * 175
+              ly = 74 + row * 22
+              pct = (b_count / total_bytes) * 100
+              pct_str = f"{pct:.2f}%" if pct >= 0.01 else "<0.01%"
+              color = LANG_COLORS.get(l_name, FALLBACK_COLORS[idx % len(FALLBACK_COLORS)])
+              safe_name = html.escape(l_name)
+              lang_svg.append(f'  <g transform="translate({lx}, {ly})" font-family="Segoe UI, Ubuntu, sans-serif">')
+              lang_svg.append(f'    <circle cx="5" cy="-4" r="5" fill="{color}"/>')
+              lang_svg.append(f'    <text x="15" y="0" fill="#abb2bf" font-size="12" font-weight="600">{safe_name} <tspan fill="#5c6370" font-weight="normal">{pct_str}</tspan></text>')
+              lang_svg.append(f'  </g>')
+
+          lang_svg.append('</svg>')
+          with open("dist/top-langs.svg", "w", encoding="utf-8") as f:
+              f.write("\n".join(lang_svg))
+
+          # --- ГЕНЕРАЦИЯ ТРОФЕЕВ (dist/trophies.svg) ---
           commits_search = fetch(
               f"https://api.github.com/search/commits?q=author:{user}",
               accept="application/vnd.github.cloak-preview+json"
@@ -69,7 +166,7 @@ jobs:
           pub_repos = u_data.get("public_repos", len(repos))
           followers = u_data.get("followers", 0)
           stars = sum(r.get("stargazers_count", 0) for r in repos)
-          langs = len(set(r.get("language") for r in repos if r.get("language"))) or 5
+          langs_cnt = max(num_langs, 1)
           commits = max(commits_search.get("total_count", 0), 160)
           prs = prs_search.get("total_count", 0)
           issues = issues_search.get("total_count", 0)
@@ -79,7 +176,6 @@ jobs:
           years = max(1, int((datetime.datetime.utcnow() - created_dt).days / 365))
 
           def get_rank(val, tiers):
-              # tiers: [(threshold, rank, title)]
               rank, title, prev_t, next_t = "C", tiers[0][2], 0, tiers[0][0]
               for i, (t, r, ttl) in enumerate(tiers):
                   if val >= t:
@@ -104,9 +200,9 @@ jobs:
                   (3, "AA", "Senior User"), (5, "AAA", "Veteran User"),
                   (8, "S", "Master User")
               ])),
-              ("Languages", langs, "langs", get_rank(langs, [
+              ("Languages", langs_cnt, "langs", get_rank(langs_cnt, [
                   (1, "C", "Mono-Lang"), (3, "B", "Bi-Lang"),
-                  (4, "A", "Multi-Lang"), (6, "AA", "Polyglot"),
+                  (5, "A", "Multi-Lang"), (7, "AA", "Polyglot"),
                   (10, "AAA", "Lang Master"), (15, "S", "Lang God")
               ])),
               ("Stars", stars, "stars", get_rank(stars, [
@@ -135,42 +231,37 @@ jobs:
               "C": ("#abb2bf", "#5c6370"),
           }
 
-          card_w, card_h, gap = 112, 120, 8
-          total_w = len(cards_data) * card_w + (len(cards_data) - 1) * gap
-          svg = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{total_w}" height="{card_h}" viewBox="0 0 {total_w} {card_h}">']
+          t_w, t_h, gap = 112, 120, 8
+          total_w = len(cards_data) * t_w + (len(cards_data) - 1) * gap
+          svg = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{total_w}" height="{t_h}" viewBox="0 0 {total_w} {t_h}">']
 
           for idx, (header, val, unit, (rank, title, prog)) in enumerate(cards_data):
-              x = idx * (card_w + gap)
+              x = idx * (t_w + gap)
               c_main, c_sec = colors.get(rank, ("#abb2bf", "#5c6370"))
-              bar_w = int(88 * prog)
+              b_w = int(88 * prog)
               svg.append(f'''
               <g transform="translate({x}, 0)" font-family="Segoe UI, Ubuntu, sans-serif">
-                <rect x="0.5" y="0.5" width="{card_w-1}" height="{card_h-1}" rx="6" fill="#282c34" stroke="#3e4451" stroke-width="1.5"/>
+                <rect x="0.5" y="0.5" width="{t_w-1}" height="{t_h-1}" rx="6" fill="#282c34" stroke="#3e4451" stroke-width="1.5"/>
                 <text x="56" y="18" fill="#e06c75" font-size="11.5" font-weight="bold" text-anchor="middle">{header}</text>
-                <!-- Лавровый венок -->
                 <path d="M28,55 C22,45 25,33 34,28 M84,55 C90,45 87,33 78,28" stroke="#98c379" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-                <!-- Кубок -->
                 <path d="M40,28 H72 V42 C72,52 64,58 56,58 C48,58 40,52 40,42 Z" fill="{c_main}"/>
                 <path d="M40,32 H34 C34,40 37,44 40,44 M72,32 H78 C78,40 75,44 72,44" stroke="{c_main}" stroke-width="2" fill="none"/>
                 <rect x="52" y="58" width="8" height="9" fill="{c_sec}"/>
                 <rect x="44" y="67" width="24" height="4" rx="1.5" fill="{c_main}"/>
-                <!-- Ранг на кубке -->
                 <text x="56" y="47" fill="#1e222a" font-size="11" font-weight="900" text-anchor="middle">{rank}</text>
-                <!-- Звание и очки -->
                 <text x="56" y="84" fill="#61afef" font-size="9.5" font-weight="bold" text-anchor="middle">{title}</text>
                 <text x="56" y="97" fill="#abb2bf" font-size="9.5" text-anchor="middle">{val} {unit}</text>
-                <!-- Прогресс-бар -->
                 <rect x="12" y="105" width="88" height="5" rx="2.5" fill="#3e4451"/>
-                <rect x="12" y="105" width="{bar_w}" height="5" rx="2.5" fill="{c_main}"/>
+                <rect x="12" y="105" width="{b_w}" height="5" rx="2.5" fill="{c_main}"/>
               </g>''')
 
           svg.append('</svg>')
           with open("dist/trophies.svg", "w", encoding="utf-8") as f:
               f.write("\n".join(svg))
           EOF
-          ls -lh dist/trophies.svg
+          ls -lh dist/
 
-      # 3. Сохраняем и Змейку, и Трофеи в ветку output
+      # 3. Сохраняем Змейку, Трофеи и Языки в ветку output
       - name: Push SVGs to the output branch
         uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
