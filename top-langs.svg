@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="168" viewBox="0 0 380 168">
+  <defs><clipPath id="bar-clip"><rect x="20" y="42" width="340" height="10" rx="5"/></clipPath></defs>
+  <rect x="0.5" y="0.5" width="379" height="167" rx="6" fill="#282c34" stroke="#3e4451" stroke-width="1.5"/>
+  <text x="20" y="27" fill="#e5c07b" font-family="Segoe UI, Ubuntu, sans-serif" font-size="15" font-weight="bold">Most Used Languages (7)</text>
+  <rect x="20" y="42" width="340" height="10" rx="5" fill="#3e4451"/>
+  <g clip-path="url(#bar-clip)">
+    <rect x="20.00" y="42" width="285.84" height="10" fill="#DA5B0B"/>
+    <rect x="305.84" y="42" width="51.09" height="10" fill="#3572A5"/>
+    <rect x="356.93" y="42" width="3.00" height="10" fill="#e34c26"/>
+    <rect x="359.93" y="42" width="3.00" height="10" fill="#f34b7d"/>
+    <rect x="362.93" y="42" width="3.00" height="10" fill="#a277ff"/>
+    <rect x="365.93" y="42" width="3.00" height="10" fill="#68b723"/>
+    <rect x="368.93" y="42" width="3.00" height="10" fill="#2496ED"/>
+  </g>
+  <g transform="translate(24, 74)" font-family="Segoe UI, Ubuntu, sans-serif">
+    <circle cx="5" cy="-4" r="5" fill="#DA5B0B"/>
+    <text x="15" y="0" fill="#abb2bf" font-size="12" font-weight="600">Jupyter Notebook <tspan fill="#5c6370" font-weight="normal">84.07%</tspan></text>
+  </g>
+  <g transform="translate(199, 74)" font-family="Segoe UI, Ubuntu, sans-serif">
+    <circle cx="5" cy="-4" r="5" fill="#3572A5"/>
+    <text x="15" y="0" fill="#abb2bf" font-size="12" font-weight="600">Python <tspan fill="#5c6370" font-weight="normal">15.03%</tspan></text>
+  </g>
+  <g transform="translate(24, 96)" font-family="Segoe UI, Ubuntu, sans-serif">
+    <circle cx="5" cy="-4" r="5" fill="#e34c26"/>
+    <text x="15" y="0" fill="#abb2bf" font-size="12" font-weight="600">HTML <tspan fill="#5c6370" font-weight="normal">0.51%</tspan></text>
+  </g>
+  <g transform="translate(199, 96)" font-family="Segoe UI, Ubuntu, sans-serif">
+    <circle cx="5" cy="-4" r="5" fill="#f34b7d"/>
+    <text x="15" y="0" fill="#abb2bf" font-size="12" font-weight="600">C++ <tspan fill="#5c6370" font-weight="normal">0.19%</tspan></text>
+  </g>
+  <g transform="translate(24, 118)" font-family="Segoe UI, Ubuntu, sans-serif">
+    <circle cx="5" cy="-4" r="5" fill="#a277ff"/>
+    <text x="15" y="0" fill="#abb2bf" font-size="12" font-weight="600">CSS <tspan fill="#5c6370" font-weight="normal">0.18%</tspan></text>
+  </g>
+  <g transform="translate(199, 118)" font-family="Segoe UI, Ubuntu, sans-serif">
+    <circle cx="5" cy="-4" r="5" fill="#68b723"/>
+    <text x="15" y="0" fill="#abb2bf" font-size="12" font-weight="600">Makefile <tspan fill="#5c6370" font-weight="normal">0.02%</tspan></text>
+  </g>
+  <g transform="translate(24, 140)" font-family="Segoe UI, Ubuntu, sans-serif">
+    <circle cx="5" cy="-4" r="5" fill="#2496ED"/>
+    <text x="15" y="0" fill="#abb2bf" font-size="12" font-weight="600">Dockerfile <tspan fill="#5c6370" font-weight="normal">0.01%</tspan></text>
+  </g>
+</svg>
