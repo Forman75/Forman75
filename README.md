@@ -127,10 +127,10 @@
 
 <h1 align="center">📊 GitHub Stats | Статистика на GitHub:</h1>
 
-<!-- Карточки статистики и языков в ТЕМНОЙ теме (theme=onedark слитно) -->
+<!-- Статистика и полная карточка ВСЕХ языков из всех репозиториев -->
 <p align="center">
-  <img height="165px" src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=Forman75&theme=onedark" alt="GitHub Stats" />
-  <img height="165px" src="https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=Forman75&theme=onedark" alt="Top Languages" />
+  <img height="175px" src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=Forman75&theme=onedark" alt="GitHub Stats" />
+  <img height="175px" src="https://raw.githubusercontent.com/Forman75/Forman75/output/top-langs.svg?v=1" alt="All Used Languages" />
 </p>
 
 <!-- Серия коммитов (GitHub Streak) -->
